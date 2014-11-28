@@ -5,6 +5,8 @@ __author__ = 'kasper'
 # da cuvam koj zbor vo kolku dokumenti se pojavil
 # i za sekoj zbor vo koj dokument kolku pati se pojavil
 
+# TODO
+
 class Block:
 
     def __init__(self):

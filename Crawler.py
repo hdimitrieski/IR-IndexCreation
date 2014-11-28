@@ -15,14 +15,6 @@ class Crawler:
         self.offset = offset
         self.docStore = ds
 
-    # Obrabotka na strana
-    def getText(self, page):
-        page = bs4.BeautifulSoup(page)
-        text = page.select('.glavenText')[0].get_text()
-        title = page.select('.vestgoretext h1')[0].get_text()
-        fullText = '\n'.join((title, text))
-        return fullText
-
     # Baranje do server za strana
     def request(self, pgid):
         print self.url + str(pgid)
@@ -35,14 +27,11 @@ class Crawler:
             file.write(page.content)
             file.close
 
-            fullText = self.getText(page.content)
-
         except IndexError, e:
-            fullText = None
+            page = None
             print e.message
 
-
-        return fullText
+        return page.content
 
     def crawl(self):
         for i in range(self.offset):

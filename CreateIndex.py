@@ -5,26 +5,37 @@ __author__ = 'kasper'
 
 from Crawler import Crawler
 import re
+import bs4
 from WordsList import WordsList
 
 class CreateIndex:
 
     # mode = 0 -> web, mode = 1 -> lokalno
-    def __init__(self, mode=0, url='', chPart=889, offset=1, fname=''):
+    # vo konstruktorov samo cfg mozam da stavam
+    # Rabota so tekst mojt da e vo druga klasa
+    def __init__(self, mode=0, url='', chPart=889, offset=1, fname='', elements=[]):
         self.mode = mode
         self.url = url
         self.chPart = chPart
         self.offset = offset
         self.docStore = fname
         self.crawler = Crawler(url, chPart, offset, fname)
+        self.elements = elements
 
-    # Vrakjat tekst procitan lokalno od fajl
-    def getTextFromFile(self, fname):
+    # Obrabotvit strana i vrakjat tekst
+    def getText(self, page):
+        page = bs4.BeautifulSoup(page)
+        text = page.select(self.elements[0])[0].get_text()
+        title = page.select(self.elements[1])[0].get_text()
+        fullText = '\n'.join((title, text))
+        return fullText
+
+    # Vrakjat html strana procitana lokalno od fajl
+    def getPageFromFile(self, fname):
         file = open(self.docStore + fname, 'r')
         page = file.read()
         file.close()
-        text = self.crawler.getText(page)
-        return text
+        return page
 
     # Vrakjat lista od site zboroj od nekoj tekst
     def getWords(self, text):
@@ -42,10 +53,11 @@ class CreateIndex:
 
         for i in range(self.offset):
             if self.mode == 0:
-                txt = self.crawler.request(self.chPart + i)
+                page = self.crawler.request(self.chPart + i)
             else:
-                txt = self.getTextFromFile(str(self.chPart + i) + '.html')
+                page = self.getPageFromFile(str(self.chPart + i) + '.html')
 
+            txt = self.getText(page)
             words = self.getWords(txt)
             wl = WordsList(i)
             wl.insertList(words)
@@ -55,6 +67,6 @@ class CreateIndex:
 
         return 0
 
-ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 889, 1, './documents/')
+el = ['.glavenText', '.vestgoretext h1']
+ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 889, 1, './documents/', el)
 ci.main()
-ci.getTextFromFile('889.html')
