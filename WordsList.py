@@ -1,6 +1,6 @@
 __author__ = 'kasper'
 
-# MEMORY
+# Lista od zboroj
 
 # TODO Funkcija __add za merge....
 

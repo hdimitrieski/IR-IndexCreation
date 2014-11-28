@@ -1,6 +1,8 @@
 # coding=utf-8
 __author__ = 'kasper'
 
+# Kreiranje indeks
+
 from Crawler import Crawler
 import re
 from WordsList import WordsList
