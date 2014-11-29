@@ -7,6 +7,7 @@ from Crawler import Crawler
 import re
 import bs4
 from WordsList import WordsList
+from Index import Index
 
 class CreateIndex:
 
@@ -21,6 +22,7 @@ class CreateIndex:
         self.docStore = fname
         self.crawler = Crawler(url, chPart, offset, fname)
         self.elements = elements
+        self.index = Index()
 
     # Obrabotvit strana i vrakjat tekst
     def getText(self, page):
@@ -57,16 +59,25 @@ class CreateIndex:
             else:
                 page = self.getPageFromFile(str(self.chPart + i) + '.html')
 
+            if not page:
+                continue
+
             txt = self.getText(page)
             words = self.getWords(txt)
             wl = WordsList(i)
             wl.insertList(words)
 
-            for it in wl.list():
-                print it + ': ' + str(wl.list()[it])
+            self.index.mergeWL(wl.list(), self.chPart + i)
 
+        ind = self.index.index()
+        fil = open('index.txt', 'w')
+        for it in ind:
+            fil.write(it + ': ')
+            fil.write(str(ind[it].docList()) + '\n')
+            # print it + ': ' + str(ind[it].docList())
+        fil.close()
         return 0
 
 el = ['.glavenText', '.vestgoretext h1']
-ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 889, 1, './documents/', el)
+ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 889, 500, './documents/', el)
 ci.main()
