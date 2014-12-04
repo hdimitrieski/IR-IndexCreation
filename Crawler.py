@@ -4,8 +4,8 @@ __author__ = 'kasper'
 # Crawler
 
 import requests as req
-import bs4
-import re
+import time
+from Log import Log
 
 class Crawler:
 
@@ -14,13 +14,15 @@ class Crawler:
         self.chPart = chPart
         self.offset = offset
         self.docStore = ds
+        self.log = Log('logfile.log')
 
-    # Baranje do server za strana
+    # Baranje do server za strana, ja vrakjam sodrzinata od stranta
     def request(self, pgid):
         print self.url + str(pgid)
         try:
             page = req.get(self.url + str(pgid) + '/')
             if page.content == 'Error':
+                self.log.log(str(time.time()) + ' - Request to file ' + str(pgid) + ' failed.')
                 return None
 
             file = open(self.docStore + str(pgid) + '.html', 'w')
@@ -29,7 +31,7 @@ class Crawler:
 
         except IndexError, e:
             page = None
-            print e.message
+            self.log.log(str(time.time()) + ' - Request to file ' + pgid + ' failed. ' + str(e.args))
 
         return page.content
 

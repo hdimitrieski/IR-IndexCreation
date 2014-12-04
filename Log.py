@@ -1,10 +1,6 @@
 __author__ = 'kasper'
 
-# da zapisvam koga pocnalo nesto koga zavrsilo
-# kolku fajloj se spustile
-# za kolku vreme koj fajl
-# kolku tekst imam
-# kolku se golemi fajlojte so se kreirale i sl...
+import os.path
 
 class Log:
 
@@ -15,5 +11,11 @@ class Log:
         print message
 
     def log(self, message):
-        a = 1
-        # vo fajl
+        if not os.path.isfile(self.logfile):
+            file = open(self.logfile, 'w')
+            file.write(message + '\n')
+            file.close()
+        else:
+            file = open(self.logfile, 'a')
+            file.write(message + '\n')
+            file.close()

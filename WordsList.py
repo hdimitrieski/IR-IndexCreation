@@ -41,7 +41,7 @@ class WordsList:
     def insertList(self, lst):
         for word in lst:
             self.__wordsCount += 1
-            if(word not in self.__wordsList):
+            if word not in self.__wordsList:
                 self.__wordsList[word] = 1
                 self.__distinctWords += 1
             else:
