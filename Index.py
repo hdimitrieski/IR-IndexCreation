@@ -25,11 +25,20 @@ class Index:
         return self.__wordsCount - self.__distinctWords
 
     def mergeWL(self, wordsList, dId):
-
-        for key in wordsList:
+        self.__wordsCount += wordsList.count()
+        for key in wordsList.list():
             if key in self.__index:
                 self.__index[key].addDocument(dId)
             else:
                 dl = DocumentList(key)
                 dl.addDocument(dId)
                 self.__index[key] = dl
+                self.__distinctWords += 1
+
+    def createFromCursor(self, cursor):
+        for data in cursor:
+            self.__index[data['_id']] = data['list']
+        return 1
+
+    def find(self, word):
+        return self.__index[word.decode('utf-8')]

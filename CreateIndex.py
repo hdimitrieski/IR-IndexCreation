@@ -10,7 +10,7 @@ from WordsList import WordsList
 from Index import Index
 from Log import Log
 import time
-import pymongo
+from DBManager import DbManager
 
 
 class CreateIndex:
@@ -28,6 +28,12 @@ class CreateIndex:
         self.crawler = Crawler(url, chPart, offset, fname)
         self.elements = elements
         self.index = Index()
+        self.__stopWords = ['сé', 'де­ка', 'овие', 'на', 'не', 'ни', 'но', 'или', '000',
+                            'ве', 'во', 'ви', 'го', 'ги', 'тој', 'ко­ја', 'за', 'ќе',
+                            'сме', 'ако', 'ми', 'би', '–', 'се', 'ова', 'таа', 'ка­ко',
+                            ' ', 'со', 'си', 'која', 'неа', 'кои', 'кое', 'а', 'д',
+                            'е', 'и', 'тоа', ' ', 'ние', 'нив', 'сум', 'од', 'по', 'па',
+                            'да', 'до', 'при', 'му', 'ја', 'што', 'тие', 'кој']
 
     # Obrabotvit strana i vrakjat tekst
     def getText(self, page):
@@ -52,6 +58,12 @@ class CreateIndex:
 
         return page
 
+    def removeStopWords(self, list):
+        newList = []
+        for word in list:
+            if word not in self.__stopWords:
+                newList.append(word)
+        return newList
     # Vrakjat lista od site zboroj od nekoj tekst
     def getWords(self, text):
         text = text.replace(u'          ', ' ')
@@ -60,9 +72,9 @@ class CreateIndex:
         text = re.sub('\s\s+', ' ', text)
         words = text.strip()
 
-        return words.split(' ')
+        return self.removeStopWords(words.split(' '))
 
-    def main(self):
+    def create(self):
         # TODO
         self.log.log('\n\n' + str(time.time()) + ' - Application started(mode: ).' + str(self.mode))
 
@@ -79,24 +91,32 @@ class CreateIndex:
             words = self.getWords(txt)
             wl = WordsList(i)
             wl.insertList(words)
-            self.index.mergeWL(wl.list(), self.chPart + i)
+            self.index.mergeWL(wl, self.chPart + i)
         # end-for
 
         self.log.log(str(time.time()) + ' - Writing index to file.')
 
         ind = self.index.index()
         fil = open('index.txt', 'w')
+        db = DbManager()
+        cdb = DbManager(collectionName='cachewordscol')
+
+        fil.write('Words: ' + str(self.index.count()) + '\n')
+        fil.write('Distinct Words: ' + str(self.index.distinctCount()) + '\n')
+        fil.write('Same Words: ' + str(self.index.sameCount()) + '\n')
+
         for it in ind:
-            fil.write(it + ': ')
-            fil.write(str(ind[it].docList()) + '\n')
-            # print it + ': ' + str(ind[it].docList())
+            if len(ind[it].docList()) > 2:
+                cdb.insert({'_id': it, 'list': ind[it].docList()})
+            else:
+                db.insert({'_id': it, 'list': ind[it].docList()})
+                ind[it] = None
         fil.close()
 
-        self.log.log('\n' + str(time.time()) + ' - Application finished.')
-        return 0
+        ind = None
+        self.index = None
 
-el = ['.glavenText', '.vestgoretext h1']
-ci = CreateIndex(0, 'http://arhiva.plusinfo.mk/vest/', 7715, 1000, './documents/2/', el)
-ci.main()
+        self.log.log('\n' + str(time.time()) + ' - Application finished.')
+        return {'wordsdb': db, 'cachedb': cdb}
 
 # TODO pojke nitki

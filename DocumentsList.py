@@ -17,6 +17,9 @@ class DocumentList:
     def docList(self):
         return self.__docList
 
+    def count(self):
+        return self.__count
+
     def searchDocument(self, dId):
         if self.__count == 0:
             self.__docList[0] = dId
