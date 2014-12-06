@@ -41,4 +41,8 @@ class Index:
         return 1
 
     def find(self, word):
-        return self.__index[word.decode('utf-8')]
+        word = word.decode('utf-8')
+        if word in self.__index:
+            return self.__index[word]
+        else:
+            return None
