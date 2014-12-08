@@ -19,13 +19,6 @@ else:
     cdb = DbManager(collectionName='cachewordscol')
     qManager = QueryManager(db, cdb)
 
-print qManager.execute('вмро AND очекува')
+print qManager.execute('(еден AND каде) OR оваа')
 
-# print cacheIndex.find('вмро')
-#
-# data = db.find('очекува')
-# if data:
-#     print data[0]['_id']
-# else:
-#     print 'Nema podatoci'
 
