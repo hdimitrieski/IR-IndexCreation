@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'kasper'
 from Index import Index
 import Tree
@@ -38,13 +39,30 @@ class QueryManager:
 
 
     def andQ(self, A, B):
+        # A ke e zbor ili lista
+        # Ako ne e lista ke zejme lista od kes ili baza
         lstA = A
         lstB = B
+
+        if not A or not B:
+            raise Exception('Грешка.' )
+            return None
+
         if not isinstance(A, list):
             lstA = self.cacheIndex.find(A)
+            if not lstA:
+                lstA = self.db.find(A)
+            if not lstA:
+                raise Exception('Зборот "' + A + '" не постои.' )
+                return None
 
         if not isinstance(B, list):
             lstB = self.cacheIndex.find(B)
+            if not lstB:
+                lstB = self.db.find(A)
+            if not lstB:
+                raise Exception('Зборот "' + B + '" не постои.' )
+                return None
 
         result = []
         i = 0
@@ -69,8 +87,20 @@ class QueryManager:
         lstB = B
         if not isinstance(A, list):
             lstA = self.cacheIndex.find(A)
+            if not lstA:
+                lstA = self.db.find(A)
+            if not lstA:
+                raise Exception('Зборот "' + A + '" не постои.')
+                return None
+
         if not isinstance(B, list):
             lstB = self.cacheIndex.find(B)
+            if not lstB:
+                lstB = self.db.find(A)
+            if not lstB:
+                raise Exception('Зборот "' + B + '" не постои.')
+                return None
+
         return list(set(lstA + lstB))
 
     def buildTree(self, query):
@@ -79,6 +109,11 @@ class QueryManager:
 
     def execute(self, query):
         qArr = self.toArray(query)
+        if len(qArr) == 1:
+            lst = self.cacheIndex.find(qArr[0])
+            if not lst:
+                lst = self.db.find(qArr[0])
+            return lst
         qTree = self.buildTree(qArr)
         result = self.executeQuery(qTree)
         return result
@@ -89,8 +124,20 @@ class QueryManager:
 
         if lnode and rnode:
             if tree.value == 'OR':
-                return self.orQ(self.executeQuery(lnode), self.executeQuery(rnode))
+                try:
+                    a = self.executeQuery(lnode)
+                    b = self.executeQuery(rnode)
+                    return self.orQ(a, b)
+                except Exception, e:
+                    print e.message
+                    return None
             elif tree.value == 'AND':
-                return self.andQ(self.executeQuery(lnode), self.executeQuery(rnode))
+                try:
+                    a = self.executeQuery(lnode)
+                    b = self.executeQuery(rnode)
+                    return self.andQ(a, b)
+                except Exception, e:
+                    print e.message
+                    return None
         else:
             return tree.value

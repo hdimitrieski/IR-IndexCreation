@@ -32,7 +32,7 @@ class DbManager:
     def find(self, word):
         data = self.collection.find({'_id': word})
         if data.count() > 0:
-            return data
+            return data[0]['list']
         else:
             return None
 

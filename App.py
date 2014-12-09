@@ -11,7 +11,7 @@ cacheIndex = Index()
 
 if not indexCreated:
     el = ['.glavenText', '.vestgoretext h1']
-    ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 4000, 10, './documents/', el)
+    ci = CreateIndex(1, 'http://arhiva.plusinfo.mk/vest/', 100000, 50000, './documents/3/', el)
     data = ci.create()
     qManager = QueryManager(data['wordsdb'], data['cachedb'])
 else:
@@ -19,6 +19,16 @@ else:
     cdb = DbManager(collectionName='cachewordscol')
     qManager = QueryManager(db, cdb)
 
-print qManager.execute('(еден AND каде) OR оваа')
+
+while True:
+    q = raw_input('Внеси израз: ')
+    if q == 'exit' or q == 'quit':
+        print 'Поздрав.'
+        break
+    else:
+        print 'Резултат: ' + str(qManager.execute(q))
+
+# print qManager.execute('((еден AND каде) OR оваа) AND луѓе')
+# print qManager.execute('еден OR каде')
 
 
