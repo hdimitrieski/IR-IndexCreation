@@ -2,6 +2,7 @@ __author__ = 'kasper'
 
 # DISC
 # TODO
+import math
 
 class DocumentList:
 
@@ -10,8 +11,8 @@ class DocumentList:
         self.__docId = did
         self.__count = 0
 
-    def addDocument(self, dId):
-        self.__docList.append(dId)
+    def addDocument(self, dId, idf):
+        self.__docList.append((dId, idf))
         self.__count += 1
 
     def docList(self):
@@ -44,6 +45,3 @@ class DocumentList:
 
             if dId > self.__docList[i]:
                 return i
-
-
-

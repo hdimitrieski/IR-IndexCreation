@@ -59,7 +59,7 @@ class QueryManager:
         if not isinstance(B, list):
             lstB = self.cacheIndex.find(B)
             if not lstB:
-                lstB = self.db.find(A)
+                lstB = self.db.find(B)
             if not lstB:
                 raise Exception('Зборот "' + B + '" не постои.' )
                 return None
@@ -96,7 +96,7 @@ class QueryManager:
         if not isinstance(B, list):
             lstB = self.cacheIndex.find(B)
             if not lstB:
-                lstB = self.db.find(A)
+                lstB = self.db.find(B)
             if not lstB:
                 raise Exception('Зборот "' + B + '" не постои.')
                 return None

@@ -11,6 +11,7 @@ from Index import Index
 from Log import Log
 import time
 from DBManager import DbManager
+import pymongo
 
 
 class CreateIndex:
@@ -44,6 +45,7 @@ class CreateIndex:
             fullText = '\n'.join((title, text))
         except IndexError, e:
             fullText = None
+
         return fullText
 
     # Vrakjat html strana procitana lokalno od fajl
@@ -59,10 +61,14 @@ class CreateIndex:
         return page
 
     def removeStopWords(self, list):
+
         newList = []
         for word in list:
             if word not in self.__stopWords:
                 newList.append(word)
+
+
+
         return newList
     # Vrakjat lista od site zboroj od nekoj tekst
     def getWords(self, text):
@@ -84,6 +90,7 @@ class CreateIndex:
             else:
                 page = self.getPageFromFile(str(self.chPart + i) + '.html')
             if not page:
+                print 'nema'
                 continue
             txt = self.getText(page)
             if not txt:
@@ -106,12 +113,17 @@ class CreateIndex:
         fil.write('Same Words: ' + str(self.index.sameCount()) + '\n')
 
         for it in ind:
-            if len(ind[it].docList()) > 2:
-                cdb.insert({'_id': it, 'list': ind[it].docList()})
+            fil.write('_id: ' + str(it) + ', list: ' + str(ind[it].docList()) + '\n')
+            if len(ind[it].docList()) > 400:
+                cdb.insert({'_id': it, 'list': str(ind[it].docList())})
+
             else:
-                db.insert({'_id': it, 'list': ind[it].docList()})
-                ind[it] = None
+                db.insert({'_id': it, 'list': str(ind[it].docList())})
         fil.close()
+
+        ############
+        # return self.index
+        ############
 
         ind = None
         self.index = None

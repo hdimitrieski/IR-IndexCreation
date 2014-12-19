@@ -30,6 +30,12 @@ class WordsList:
     def words(self):
         return self.__wordsList.keys()
 
+    def getWord(self, word):
+        return self.__wordsList[word]
+
+    def tf(self, word, value):
+        self.__wordsList[word] = value
+
     def addWord(self, word):
         self.__wordsCount += 1
         if word in self.__wordsList:
@@ -46,4 +52,3 @@ class WordsList:
                 self.__distinctWords += 1
             else:
                 self.__wordsList[word] += 1
-
